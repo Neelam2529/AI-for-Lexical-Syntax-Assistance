@@ -1,5 +1,3 @@
-numpy
-pandas
-scikit-learn
-tensorflow
 torch
+streamlit
+streamlit-ace
