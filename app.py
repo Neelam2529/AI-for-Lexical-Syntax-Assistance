@@ -89,7 +89,7 @@ with col1:
     code_input = st_ace(
         value=code_value,
         language="c_cpp" if language == "C" else "python",
-        theme="monokai",
+        theme="textmate",
         keybinding="vscode",
         font_size=14,
         tab_size=4,
@@ -122,7 +122,7 @@ with col2:
                 # 2. Syntax Check
                 st.info("Running LSTM Syntax Detection...")
                 detector = SyntaxDetector()
-                detector_output = detector.detect_error(code_input)
+                detector_output = detector.detect_error(code_input, language=language)
                 
                 if detector_output["is_buggy"]:
                     line_num = detector_output["error_line_number"]

@@ -143,7 +143,7 @@ class SyntaxDetector:
         except SyntaxError as e:
             return True, e.lineno or 1, "python_syntax_error"
 
-    def detect_error(self, code_snippet):
+    def detect_error(self, code_snippet, language="C"):
         """Runs inference to identify if there's a syntax error and its location."""
         tokens = self.tokenizer.encode(code_snippet)
         seq_len = len(tokens)
@@ -173,9 +173,7 @@ class SyntaxDetector:
                 error_line = code_snippet.count('\n') + 1
 
         # Always run the static engine as the ground truth
-        is_python = self._is_python(code_snippet)
-        
-        if is_python:
+        if language == "Python":
             static_buggy, static_line, error_type = self._check_python_static(code_snippet)
         else:
             static_buggy, static_line, error_type = self._check_c_static(code_snippet)
