@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import random
 
-def generate_synthetic_dataset(num_samples=500):
+def generate_synthetic_dataset(num_samples=1500):
     data = []
     
     # Expanded C patterns
@@ -10,7 +10,10 @@ def generate_synthetic_dataset(num_samples=500):
         "int main() {\n    printf(\"Hello World\\n\");\n    return 0;\n}",
         "for(int i=0; i<10; i++) {\n    printf(\"%d\", i);\n}",
         "int x = 5;\nint y = 10;\nint sum = x + y;",
-        "if (x > 0) {\n    printf(\"Positive\");\n}"
+        "if (x > 0) {\n    printf(\"Positive\");\n}",
+        "void sayHello() {\n    printf(\"Hi\");\n}",
+        "int arr[5] = {1, 2, 3, 4, 5};",
+        "struct Point { int x; int y; };"
     ]
     
     # Expanded Python patterns
@@ -18,7 +21,10 @@ def generate_synthetic_dataset(num_samples=500):
         "def greet(name):\n    print('Hello ' + name)",
         "for i in range(10):\n    print(i)",
         "x = 5\ny = 10\nprint(x + y)",
-        "if x > 0:\n    print('Positive')"
+        "if x > 0:\n    print('Positive')",
+        "my_list = [1, 2, 3, 4]",
+        "class Dog:\n    def bark(self):\n        pass",
+        "import os\nos.getcwd()"
     ]
     
     for _ in range(num_samples):
@@ -26,30 +32,42 @@ def generate_synthetic_dataset(num_samples=500):
         if lang == 'C':
             base_code = random.choice(c_templates)
             err_roll = random.random()
-            if err_roll < 0.33 and ";" in base_code:
+            if err_roll < 0.20 and ";" in base_code:
                 # Missing semicolon
                 parts = base_code.rsplit(";", 1)
                 buggy_code = "".join(parts)
                 error_type = "missing_semicolon"
-            elif err_roll < 0.66 and "}" in base_code:
+            elif 0.20 <= err_roll < 0.40 and "}" in base_code:
                 # Missing brace
                 buggy_code = base_code.replace("}", "", 1)
                 error_type = "missing_brace"
+            elif 0.40 <= err_roll < 0.60 and "(" in base_code:
+                # Missing opening parenthesis
+                buggy_code = base_code.replace("(", "", 1)
+                error_type = "missing_open_paren"
+            elif 0.60 <= err_roll < 0.80 and "," in base_code:
+                # Missing comma
+                buggy_code = base_code.replace(",", "", 1)
+                error_type = "missing_comma"
             else:
                 buggy_code = base_code
                 error_type = "clean"
         else:
             base_code = random.choice(py_templates)
             err_roll = random.random()
-            if err_roll < 0.25 and ":" in base_code:
+            if err_roll < 0.20 and ":" in base_code:
                 buggy_code = base_code.replace(":", "", 1)
                 error_type = "missing_colon"
-            elif err_roll < 0.50 and "print(" in base_code:
+            elif 0.20 <= err_roll < 0.40 and "print(" in base_code:
                 buggy_code = base_code.replace("print(", "print", 1)
                 error_type = "missing_parenthesis"
-            elif err_roll < 0.75 and "'" in base_code:
+            elif 0.40 <= err_roll < 0.60 and "'" in base_code:
                 buggy_code = base_code.replace("'", "", 1)
                 error_type = "missing_quote"
+            elif 0.60 <= err_roll < 0.80 and "[" in base_code:
+                # Missing list bracket
+                buggy_code = base_code.replace("[", "", 1)
+                error_type = "missing_list_bracket"
             else:
                 buggy_code = base_code
                 error_type = "clean"
@@ -74,8 +92,8 @@ def generate_synthetic_dataset(num_samples=500):
     return df
 
 def preprocess_code_data(output_csv_path):
-    print("Generating synthetic dataset...")
-    df = generate_synthetic_dataset(1000)
+    print("Generating synthetic dataset with EXPANDED ERROR CLASSES...")
+    df = generate_synthetic_dataset(2000)
     
     os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
     df.to_csv(output_csv_path, index=False)

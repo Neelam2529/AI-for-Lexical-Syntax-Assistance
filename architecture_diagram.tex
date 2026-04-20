@@ -1,0 +1,62 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc}
+
+\begin{document}
+
+\begin{center}
+    \vspace*{2cm}
+    \textbf{\Large AI Lexical \& Syntax Assistant: System Architecture Pipeline}
+    \vspace{1.5cm}
+
+    % Define TikZ Styles
+    \tikzset{
+        inputnode/.style={rectangle, rounded corners, draw=black, fill=blue!10, very thick, text width=4cm, minimum height=1cm, text centered, font=\sffamily\bfseries},
+        processnode/.style={rectangle, draw=black, fill=orange!10, very thick, text width=4.5cm, minimum height=1cm, text centered, font=\sffamily\small},
+        decisionnode/.style={diamond, aspect=2, draw=black, fill=yellow!20, very thick, text width=2.5cm, text badly centered, inner sep=0pt, font=\sffamily\small},
+        terminalnode/.style={rectangle, rounded corners, draw=black, fill=red!15, very thick, text width=3.5cm, minimum height=1cm, text centered, font=\sffamily\bfseries\small},
+        successnode/.style={rectangle, rounded corners, draw=black, fill=green!15, very thick, text width=3.5cm, minimum height=1cm, text centered, font=\sffamily\bfseries\small},
+        arrow/.style={thick,->,>=stealth}
+    }
+
+    \begin{tikzpicture}[node distance=1cm and 1cm, auto, scale=0.9, transform shape]
+
+        % 1. Input Node
+        \node (input) [inputnode] {User Code Input \\ (Streamlit GUI)};
+
+        % 2. Security Scanner phase
+        \node (sec_scan) [processnode, below=1.5cm of input] {Context Security Scanner \\ (Regex Engine)};
+        \node (dec_sec) [decisionnode, below=1cm of sec_scan] {Malicious Threat?};
+        \node (sec_alert) [terminalnode, right=1.5cm of dec_sec] {Block \& Security Alert};
+
+        % 3. AI Prediction phase
+        \node (ai_engine) [processnode, below=1.5cm of dec_sec] {Hybrid Syntax Detector \\ (LSTM Neural Network)};
+
+        % 4. Static Ground Truth Engine
+        \node (static_engine) [processnode, below=1cm of ai_engine] {Semantic Fallback Engine \\ (AST \& Static Rules)};
+        \node (dec_syn) [decisionnode, below=1cm of static_engine] {Syntax/Semantic Bug?};
+
+        % 5. Outcomes
+        \node (clean) [successnode, left=1.5cm of dec_syn] {Clean Compilation \\ Success};
+        \node (corrector) [processnode, right=1.5cm of dec_syn] {Correction Module \\ (Generate AI Suggestion)};
+        \node (fix_out) [terminalnode, fill=orange!20, below=1.5cm of corrector] {Output Error \& Code Fix};
+
+        % Draw arrows
+        \draw [arrow] (input) -- (sec_scan);
+        \draw [arrow] (sec_scan) -- (dec_sec);
+        \draw [arrow] (dec_sec) -- node[above] {Yes} (sec_alert);
+        \draw [arrow] (dec_sec) -- node[right] {No (Safe)} (ai_engine);
+        
+        \draw [arrow] (ai_engine) -- (static_engine);
+        \draw [arrow] (static_engine) -- (dec_syn);
+        
+        \draw [arrow] (dec_syn) -- node[above] {No} (clean);
+        \draw [arrow] (dec_syn) -- node[above] {Yes} (corrector);
+        
+        \draw [arrow] (corrector) -- (fix_out);
+
+    \end{tikzpicture}
+\end{center}
+
+\end{document}
